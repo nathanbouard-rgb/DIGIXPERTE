@@ -1,0 +1,401 @@
+<!-- PAGE: RESSOURCES -->
+<!-- ============================================================ -->
+<div class="page" id="page-ressources">
+
+<style>
+/* ===== RESSOURCES PAGE ===== */
+.res-hero{background:linear-gradient(160deg,var(--dark) 0%,#1a1060 55%,#8b9cf7 100%);padding:130px 32px 80px;text-align:center;position:relative;overflow:hidden}
+.res-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 50%,rgba(99,102,241,.3) 0%,transparent 70%)}
+.res-hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50px;padding:7px 18px;font-size:13px;color:rgba(255,255,255,.75);margin-bottom:22px;backdrop-filter:blur(8px)}
+.res-hero h1{font-size:clamp(36px,6vw,72px);color:#fff;letter-spacing:-2px;line-height:1.08;margin-bottom:16px;position:relative;z-index:1}
+.res-hero p{color:rgba(255,255,255,.6);font-size:16px;max-width:560px;margin:0 auto;position:relative;z-index:1;line-height:1.7}
+
+/* Section titles */
+.res-section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;gap:16px;flex-wrap:wrap}
+.res-section-head h2{font-size:clamp(26px,4vw,42px);letter-spacing:-1px;line-height:1.1}
+.res-section-head p{color:var(--gray);font-size:14px;max-width:420px}
+
+/* ── LEAD MAGNET ── */
+.lm-wrap{background:linear-gradient(160deg,var(--dark) 0%,#1a1060 50%,#312e81 100%);border-radius:28px;padding:60px;display:grid;grid-template-columns:1fr 360px;gap:56px;align-items:center;position:relative;overflow:hidden}
+.lm-wrap::before{content:'';position:absolute;top:-80px;right:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);pointer-events:none}
+.lm-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(165,180,252,.15);border:1px solid rgba(165,180,252,.25);border-radius:50px;padding:6px 16px;font-size:12px;color:#a5b4fc;font-weight:600;margin-bottom:18px}
+.lm-wrap h2{font-size:clamp(28px,4vw,48px);color:#fff;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
+.lm-wrap p{color:rgba(255,255,255,.6);font-size:15px;line-height:1.75;margin-bottom:28px}
+.lm-bullets{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.lm-bullets li{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.8)}
+.lm-bullets li::before{content:'';display:none}
+/* Form inside lead magnet */
+.lm-form{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px;backdrop-filter:blur(12px)}
+.lm-form h3{color:#fff;font-size:18px;margin-bottom:6px}
+.lm-form p{color:rgba(255,255,255,.5);font-size:13px;margin-bottom:22px;line-height:1.5}
+.lm-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.lm-field label{font-size:12px;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px}
+.lm-field input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 16px;font-size:14px;color:#fff;font-family:inherit;outline:none;transition:border-color .2s}
+.lm-field input::placeholder{color:rgba(255,255,255,.3)}
+.lm-field input:focus{border-color:#818cf8;background:rgba(255,255,255,.11)}
+.lm-success{display:none;text-align:center;padding:20px 0}
+.lm-success-icon{width:56px;height:56px;background:linear-gradient(135deg,#4f46e5,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.lm-success p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.6}
+
+/* ── LIVRE BLANC ── */
+.livres-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.lb-card{border-radius:20px;overflow:hidden;border:1px solid #eaecf8;transition:all .3s;cursor:pointer;background:#fff}
+.lb-card:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(59,75,219,.14);border-color:var(--blue2)}
+.lb-cover{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.lb-cover-badge{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:#fff;backdrop-filter:blur(6px)}
+.lb-cover-pages{position:absolute;bottom:14px;right:14px;background:rgba(0,0,0,.35);border-radius:20px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,.8)}
+.lb-body{padding:22px}
+.lb-body h3{font-size:17px;margin-bottom:8px;line-height:1.3}
+.lb-body p{font-size:13px;color:var(--gray);line-height:1.65;margin-bottom:16px}
+.lb-footer{display:flex;align-items:center;justify-content:space-between;padding:0 22px 20px}
+.lb-free{font-size:12px;font-weight:700;color:#059669;display:flex;align-items:center;gap:5px}
+.lb-dl{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--blue);cursor:pointer;transition:gap .2s}
+.lb-dl:hover{gap:10px}
+
+/* ── ARTICLES ── */
+.res-blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+
+/* ── PARTENAIRE ── */
+.partner-wrap{background:linear-gradient(135deg,#f0f2ff 0%,#e8ecff 100%);border-radius:28px;padding:52px;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center}
+.partner-logo-box{width:100px;height:100px;background:#fff;border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(59,75,219,.12);margin-bottom:20px}
+.partner-wrap h2{font-size:clamp(22px,3.5vw,36px);letter-spacing:-1px;margin-bottom:12px}
+.partner-wrap p{color:var(--gray);font-size:14px;line-height:1.75;margin-bottom:8px}
+.partner-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ppill{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px}
+.partner-cta-box{text-align:center;min-width:220px}
+.partner-stat{font-size:48px;font-weight:900;color:var(--blue);line-height:1}
+.partner-stat-label{font-size:13px;color:var(--gray);margin-bottom:20px}
+
+/* ── NEWSLETTER ── */
+.res-nl{background:var(--dark);border-radius:28px;padding:52px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.res-nl h2{font-size:clamp(24px,3.5vw,38px);color:#fff;letter-spacing:-1px;margin-bottom:10px}
+.res-nl p{color:rgba(255,255,255,.55);font-size:14px;line-height:1.7}
+.res-nl-form{display:flex;flex-direction:column;gap:12px}
+.res-nl-input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 18px;font-size:14px;color:#fff;font-family:inherit;outline:none;transition:border-color .2s}
+.res-nl-input::placeholder{color:rgba(255,255,255,.35)}
+.res-nl-input:focus{border-color:#818cf8}
+.res-nl-note{font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:5px}
+
+@media(max-width:900px){
+  .lm-wrap,.partner-wrap,.res-nl{grid-template-columns:1fr}
+  .partner-cta-box{text-align:left}
+}
+@media(max-width:700px){
+  .livres-grid,.res-blog-grid{grid-template-columns:1fr}
+}
+</style>
+
+<!-- HERO -->
+<div class="res-hero">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="res-hero-tag">
+      <i data-lucide="book-open" style="width:14px;height:14px;stroke:currentColor;fill:none"></i>
+      Guides · Livres blancs · Outils gratuits
+    </div>
+    <h1>Ressources <span class="italic">gratuites</span><br>pour votre croissance</h1>
+    <p>Guides pratiques, livres blancs, articles experts et outils sélectionnés pour vous aider à développer votre présence digitale.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- LEAD MAGNET -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="lm-wrap">
+      <!-- Left: pitch -->
+      <div>
+        <div class="lm-tag">
+          <i data-lucide="gift" style="width:12px;height:12px;stroke:currentColor;fill:none"></i>
+          Téléchargement gratuit
+        </div>
+        <h2>Le guide complet<br>du <span class="italic">marketing digital</span><br>pour les PME</h2>
+        <p>Tout ce que vous devez savoir pour attirer des clients en ligne, sans gaspiller votre budget. 40 pages actionnables, zéro jargon.</p>
+        <ul class="lm-bullets">
+          <li><i data-lucide="check-circle" style="width:16px;height:16px;stroke:#6ee7b7;fill:none;flex-shrink:0"></i> Checklist SEO pour débutants (on-page + local)</li>
+          <li><i data-lucide="check-circle" style="width:16px;height:16px;stroke:#6ee7b7;fill:none;flex-shrink:0"></i> Stratégie Google Ads avec 500€/mois</li>
+          <li><i data-lucide="check-circle" style="width:16px;height:16px;stroke:#6ee7b7;fill:none;flex-shrink:0"></i> Templates de posts réseaux sociaux</li>
+          <li><i data-lucide="check-circle" style="width:16px;height:16px;stroke:#6ee7b7;fill:none;flex-shrink:0"></i> Tableau de bord KPI à dupliquer</li>
+          <li><i data-lucide="check-circle" style="width:16px;height:16px;stroke:#6ee7b7;fill:none;flex-shrink:0"></i> 15 outils gratuits recommandés</li>
+        </ul>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap-6px">
+            <div style="display:flex">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#8b5cf6);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-4px">N</div>
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0284c7);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px">A</div>
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#9333ea);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-left:-8px">M</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,.55)"><strong style="color:#fff">+1 200</strong> entrepreneurs l'ont déjà téléchargé</div>
+        </div>
+      </div>
+      <!-- Right: form -->
+      <div class="lm-form" id="lmFormBox">
+        <h3>Recevez le guide gratuitement</h3>
+        <p>Entrez votre email et recevez le PDF en moins de 2 minutes.</p>
+        <form onsubmit="submitLM(event)" novalidate>
+          <div class="lm-field">
+            <label>Prénom</label>
+            <input type="text" placeholder="Votre prénom" required>
+          </div>
+          <div class="lm-field">
+            <label>Email professionnel</label>
+            <input type="email" placeholder="vous@exemple.fr" required>
+          </div>
+          <div class="lm-field">
+            <label>Votre entreprise</label>
+            <input type="text" placeholder="Nom de votre société (optionnel)">
+          </div>
+          <div style="margin:12px 0;display:flex;align-items:flex-start;gap:8px">
+            <input type="checkbox" id="lmRgpd" style="margin-top:3px;flex-shrink:0;accent-color:#818cf8" required>
+            <label for="lmRgpd" style="font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;line-height:1.5">J'accepte de recevoir des ressources et conseils de DIGIXPERTE. Désabonnement possible à tout moment.</label>
+          </div>
+          <button type="submit" class="btn btn-blue" style="width:100%;justify-content:center;font-size:15px;padding:12px 12px 12px 22px">
+            Télécharger gratuitement
+            <span class="bi"><i data-lucide="download" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span>
+          </button>
+          <div style="text-align:center;margin-top:10px;font-size:11px;color:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i data-lucide="lock" style="width:11px;height:11px;stroke:currentColor;fill:none"></i>
+            Aucun spam · Données sécurisées
+          </div>
+        </form>
+        <div class="lm-success" id="lmSuccess">
+          <div class="lm-success-icon"><i data-lucide="check" style="width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5"></i></div>
+          <strong style="color:#fff;font-size:16px">C'est parti ! 🎉</strong>
+          <p style="margin-top:8px">Votre guide arrive dans votre boîte mail d'ici quelques minutes. Vérifiez vos spams si nécessaire.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- LIVRES BLANCS -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" style="background:#fafbff">
+  <div class="container">
+    <div class="res-section-head">
+      <div>
+        <h2>Livres blancs <span class="italic">&amp; guides</span></h2>
+        <p>Des ressources approfondies pour maîtriser chaque levier du marketing digital.</p>
+      </div>
+      <button class="btn btn-blue" onclick="showPage('audit')">
+        Audit gratuit <span class="bi"><i data-lucide="arrow-up-right" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span>
+      </button>
+    </div>
+    <div class="livres-grid">
+
+      <!-- Livre 1 - Lead magnet principal -->
+      <div class="lb-card" onclick="document.getElementById('lmFormBox').scrollIntoView({behavior:'smooth'});showPage('ressources')">
+        <div class="lb-cover" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">
+          <div style="text-align:center">
+            <i data-lucide="book-open" style="width:52px;height:52px;stroke:rgba(255,255,255,.9);fill:none;stroke-width:1.3"></i>
+          </div>
+          <div class="lb-cover-badge">⭐ Guide phare</div>
+          <div class="lb-cover-pages">40 pages</div>
+        </div>
+        <div class="lb-body">
+          <h3>Le guide complet du marketing digital pour les PME</h3>
+          <p>SEO, Ads, réseaux sociaux, branding — tout ce qu'il faut pour lancer ou relancer sa stratégie digitale.</p>
+        </div>
+        <div class="lb-footer">
+          <span class="lb-free"><i data-lucide="gift" style="width:12px;height:12px;stroke:currentColor;fill:none"></i> Gratuit</span>
+          <span class="lb-dl"><i data-lucide="download" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Télécharger</span>
+        </div>
+      </div>
+
+      <!-- Livre 2 -->
+      <div class="lb-card">
+        <div class="lb-cover" style="background:linear-gradient(135deg,#0f766e,#0ea5e9)">
+          <div style="text-align:center">
+            <i data-lucide="search" style="width:52px;height:52px;stroke:rgba(255,255,255,.9);fill:none;stroke-width:1.3"></i>
+          </div>
+          <div class="lb-cover-badge">SEO</div>
+          <div class="lb-cover-pages">28 pages</div>
+        </div>
+        <div class="lb-body">
+          <h3>Le SEO local expliqué aux dirigeants</h3>
+          <p>Comment dominer Google Maps et les résultats locaux sans être expert technique. Guide pas à pas.</p>
+        </div>
+        <div class="lb-footer">
+          <span class="lb-free"><i data-lucide="clock" style="width:12px;height:12px;stroke:currentColor;fill:none"></i> Bientôt disponible</span>
+          <span class="lb-dl" style="color:var(--gray)"><i data-lucide="bell" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Me notifier</span>
+        </div>
+      </div>
+
+      <!-- Livre 3 -->
+      <div class="lb-card">
+        <div class="lb-cover" style="background:linear-gradient(135deg,#dc2626,#9333ea)">
+          <div style="text-align:center">
+            <i data-lucide="megaphone" style="width:52px;height:52px;stroke:rgba(255,255,255,.9);fill:none;stroke-width:1.3"></i>
+          </div>
+          <div class="lb-cover-badge">Publicité</div>
+          <div class="lb-cover-pages">32 pages</div>
+        </div>
+        <div class="lb-body">
+          <h3>Meta Ads & Google Ads : le duo gagnant</h3>
+          <p>Stratégie combinée, budgets, ciblage et créatifs — un plan concret pour PME avec budget limité.</p>
+        </div>
+        <div class="lb-footer">
+          <span class="lb-free"><i data-lucide="clock" style="width:12px;height:12px;stroke:currentColor;fill:none"></i> Bientôt disponible</span>
+          <span class="lb-dl" style="color:var(--gray)"><i data-lucide="bell" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Me notifier</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- ARTICLES DE BLOG -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="res-section-head">
+      <div>
+        <h2>Articles <span class="italic">experts</span></h2>
+        <p>Nos meilleurs articles pour comprendre et maîtriser le marketing digital.</p>
+      </div>
+      <button class="btn-link" onclick="showPage('blog')" style="white-space:nowrap">
+        Tous les articles <i data-lucide="arrow-right" style="width:14px;height:14px;stroke:currentColor;fill:none;vertical-align:middle"></i>
+      </button>
+    </div>
+    <div class="res-blog-grid">
+      <div class="bcard" onclick="showPage('art-seo-local')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#3b4bdb,#6d28d9);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="search" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Mars 2025 · <span>SEO</span></div>
+        <h3>Pourquoi le SEO est essentiel pour les entreprises locales</h3>
+      </div>
+      <div class="bcard" onclick="showPage('art-seo-vs-ads')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#dc2626,#9333ea);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="bar-chart-2" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Fév. 2025 · <span>Stratégie</span></div>
+        <h3>SEO vs Google Ads : quelle stratégie choisir ?</h3>
+      </div>
+      <div class="bcard" onclick="showPage('art-erreurs-seo')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#b45309,#dc2626);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="alert-triangle" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Fév. 2025 · <span>SEO</span></div>
+        <h3>10 erreurs qui tuent le référencement de votre site</h3>
+      </div>
+      <div class="bcard" onclick="showPage('art-site-convertit')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#0f766e,#0284c7);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="monitor" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Mars 2025 · <span>Création Web</span></div>
+        <h3>Comment créer un site web qui convertit vraiment</h3>
+      </div>
+      <div class="bcard" onclick="showPage('art-meta-ads')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#1e3a8a,#4f46e5);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="megaphone" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Nov. 2024 · <span>Publicité</span></div>
+        <h3>Meta Ads : comment générer des ventes rapidement</h3>
+      </div>
+      <div class="bcard" onclick="showPage('art-tendances')">
+        <div class="bcard-img"><div style="background:linear-gradient(135deg,#0d9488,#3b4bdb);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><i data-lucide="trending-up" style="width:36px;height:36px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.3"></i></div></div>
+        <div class="bmeta">Nov. 2024 · <span>Tendances</span></div>
+        <h3>Les tendances du marketing digital en 2025</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- PARTENAIRE / ACCOMPAGNEMENT -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="section" style="background:#fafbff">
+  <div class="container">
+    <div class="partner-wrap">
+      <div>
+        <div class="partner-logo-box">
+          <i data-lucide="briefcase" style="width:44px;height:44px;stroke:var(--blue);fill:none;stroke-width:1.3"></i>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">Notre entreprise partenaire</div>
+        <h2>Accompagnement <span class="italic">stratégique</span><br>d'entreprise</h2>
+        <p>Au-delà du marketing digital, nous accompagnons les dirigeants dans leur développement stratégique global — structuration, croissance, financement et transformation.</p>
+        <p>Un lien complémentaire entre votre visibilité en ligne et votre stratégie d'entreprise pour des résultats durables.</p>
+        <div class="partner-pills">
+          <span class="ppill"><i data-lucide="target" style="width:12px;height:12px;stroke:var(--blue);fill:none"></i> Stratégie de croissance</span>
+          <span class="ppill"><i data-lucide="users" style="width:12px;height:12px;stroke:var(--blue);fill:none"></i> Accompagnement dirigeant</span>
+          <span class="ppill"><i data-lucide="trending-up" style="width:12px;height:12px;stroke:var(--blue);fill:none"></i> Développement commercial</span>
+          <span class="ppill"><i data-lucide="file-text" style="width:12px;height:12px;stroke:var(--blue);fill:none"></i> Business plan</span>
+        </div>
+        <div style="margin-top:28px;display:flex;gap:14px;flex-wrap:wrap">
+          <a href="#" target="_blank" class="btn btn-blue" id="partnerLink">
+            Découvrir le site
+            <span class="bi"><i data-lucide="external-link" style="width:15px;height:15px;stroke:currentColor;fill:none"></i></span>
+          </a>
+          <button class="btn-link" onclick="showPage('contact')">
+            En savoir plus <i data-lucide="arrow-right" style="width:14px;height:14px;stroke:currentColor;fill:none;vertical-align:middle"></i>
+          </button>
+        </div>
+      </div>
+      <div class="partner-cta-box">
+        <div style="background:linear-gradient(135deg,#eef0ff,#e0e4ff);border-radius:20px;padding:36px;text-align:center">
+          <div class="partner-stat">360°</div>
+          <div class="partner-stat-label">Vision stratégique complète</div>
+          <div style="border-top:1px solid #e5e7eb;padding-top:18px;margin-top:4px">
+            <div class="partner-stat" style="font-size:36px">+50</div>
+            <div class="partner-stat-label">Entrepreneurs accompagnés</div>
+          </div>
+          <div style="border-top:1px solid #e5e7eb;padding-top:18px;margin-top:4px">
+            <div class="partner-stat" style="font-size:36px">5★</div>
+            <div class="partner-stat-label">Note moyenne clients</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- NEWSLETTER -->
+<!-- ══════════════════════════════════════════════════ -->
+<section style="padding:80px 0;background:#fff">
+  <div class="container">
+    <div class="res-nl">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px">Newsletter</div>
+        <h2>Conseils digitaux<br><span class="italic">chaque semaine</span></h2>
+        <p>Rejoignez +800 dirigeants qui reçoivent nos analyses, tips SEO, exemples de campagnes et ressources exclusives — chaque lundi matin.</p>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap-5px;font-size:13px;color:rgba(255,255,255,.5)"><i data-lucide="check-circle" style="width:14px;height:14px;stroke:#6ee7b7;fill:none;margin-right:6px"></i> 0 spam</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)"><i data-lucide="check-circle" style="width:14px;height:14px;stroke:#6ee7b7;fill:none;margin-right:6px"></i> Désabonnement en 1 clic</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)"><i data-lucide="check-circle" style="width:14px;height:14px;stroke:#6ee7b7;fill:none;margin-right:6px"></i> 100% gratuit</div>
+        </div>
+      </div>
+      <div class="res-nl-form">
+        <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:4px">Rejoignez la communauté</div>
+        <input class="res-nl-input" type="text" placeholder="Votre prénom">
+        <input class="res-nl-input" type="email" placeholder="votre@email.fr">
+        <button class="btn btn-pill" style="justify-content:center" onclick="this.innerHTML='<i data-lucide=\'check\' style=\'width:16px;height:16px;stroke:var(--blue);fill:none;margin-right:6px;vertical-align:middle\'></i> Inscription confirmée !';this.style.background='#ecfdf5';lucide.createIcons()">
+          Je m'abonne gratuitement
+          <span class="bi"><i data-lucide="arrow-up-right" style="width:15px;height:15px;stroke:currentColor;fill:none"></i></span>
+        </button>
+        <div class="res-nl-note">
+          <i data-lucide="shield-check" style="width:12px;height:12px;stroke:currentColor;fill:none"></i>
+          Vos données restent confidentielles. Voir notre <button type="button" onclick="showPage('legal-privacy')" style="color:rgba(165,180,252,.6);background:none;border:none;cursor:pointer;font-size:11px;padding:0;text-decoration:underline">politique de confidentialité</button>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK -->
+<div style="text-align:center;padding:0 0 40px;background:#fff">
+  <button class="btn-link" onclick="showPage('home')" style="color:var(--gray)">
+    <i data-lucide="arrow-left" style="width:14px;height:14px;stroke:currentColor;fill:none;vertical-align:middle;margin-right:4px"></i>
+    Retour à l'accueil
+  </button>
+</div>
+
+<script>
+function submitLM(e) {
+  e.preventDefault();
+  const cb = document.getElementById('lmRgpd');
+  if (!cb.checked) { cb.style.outline='2px solid #ef4444'; setTimeout(()=>cb.style.outline='',2000); return; }
+  document.querySelector('#lmFormBox form').style.display = 'none';
+  document.getElementById('lmSuccess').style.display = 'block';
+  // TODO: ici, déclencher le téléchargement du fichier quand il sera disponible
+  // window.open('URL_DU_FICHIER', '_blank');
+}
+</script>
+
+</div><!-- /page-ressources -->
+
+
