@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIGIXPERTE Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0b0f;--bg2:#111218;--bg3:#16181f;--bg4:#1c1e27;
+  --border:#ffffff0d;--border2:#ffffff18;
+  --blue:#6366f1;--blue2:#818cf8;--blue3:#c7d2fe;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --r:12px;--rs:8px;--sh:0 4px 24px rgba(0,0,0,.4);--tr:all .2s cubic-bezier(.4,0,.2,1);
+  --font:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.login-logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center}
+.login-logo span{font-family:var(--font);font-size:18px;font-weight:800;color:var(--text)}
+.login-box h2{font-family:var(--font);font-size:22px;font-weight:700;margin-bottom:6px;text-align:center}
+.login-box p{color:var(--text2);font-size:13px;text-align:center;margin-bottom:28px}
+.lf{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.lf label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px}
+.lf input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:11px 14px;font-size:14px;color:var(--text);outline:none;transition:var(--tr)}
+.lf input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;border-radius:var(--rs);padding:13px;font-size:15px;font-weight:700;font-family:var(--font);color:#fff;margin-top:8px;transition:var(--tr)}
+.login-btn:hover{opacity:.9;transform:translateY(-1px)}
+.login-error{color:var(--red);font-size:12px;text-align:center;margin-top:10px;display:none}
+
+/* APP */
+#app{display:none;height:100%;flex-direction:row}
+#app.visible{display:flex}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;overflow:hidden;transition:width .25s ease}
+.sidebar.collapsed{width:64px;min-width:64px}
+.sb-header{padding:20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);height:64px}
+.sb-logo-icon{width:32px;height:32px;min-width:32px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-text{font-family:var(--font);font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .sb-logo-text{opacity:0;width:0}
+.sb-toggle{margin-left:auto;background:none;border:none;color:var(--text2);padding:4px;flex-shrink:0;transition:var(--tr)}
+.sb-toggle:hover{color:var(--text)}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 8px;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-group-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .sb-group-label{opacity:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;color:var(--text2);transition:var(--tr);position:relative;border:none;background:none;width:100%;text-align:left;white-space:nowrap}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:rgba(99,102,241,.15);color:var(--blue2)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:70%;background:var(--blue);border-radius:0 3px 3px 0}
+.sb-item-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-item-label{font-size:13px;font-weight:500;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .sb-item-label{opacity:0;width:0}
+.sb-badge{margin-left:auto;background:var(--blue);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;flex-shrink:0;transition:opacity .2s}
+.sidebar.collapsed .sb-badge{opacity:0}
+.sb-footer{padding:12px 8px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:var(--tr)}
+.sb-user:hover{background:var(--bg3)}
+.sb-avatar{width:32px;height:32px;min-width:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.sb-user-info{overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .sb-user-info{opacity:0;width:0}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap}
+.sb-user-role{font-size:11px;color:var(--text2);white-space:nowrap}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.topbar-title{font-family:var(--font);font-size:18px;font-weight:700;flex:1}
+.topbar-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 14px;min-width:220px}
+.topbar-search input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
+.topbar-search input::placeholder{color:var(--text3)}
+.tb-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:6px;font-size:13px;transition:var(--tr)}
+.tb-btn:hover{color:var(--text);background:var(--bg4)}
+.tb-notif{position:relative}
+.tb-notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+.content{flex:1;overflow-y:auto;padding:24px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideOut{to{opacity:0;transform:translateY(12px)}}
+
+/* COMPONENTS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:var(--tr)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.stat-badge.up{background:rgba(16,185,129,.12);color:var(--green)}
+.stat-val{font-family:var(--font);font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--text2)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:6px}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.table-header h3{font-family:var(--font);font-size:15px;font-weight:700}
+.table-actions{display:flex;gap:8px;align-items:center}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-name{font-weight:600;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(16,185,129,.12);color:var(--green)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--amber)}
+.badge-blue{background:rgba(99,102,241,.12);color:var(--blue2)}
+.badge-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+.badge-gray{background:rgba(148,163,184,.1);color:var(--text2)}
+.badge-cyan{background:rgba(6,182,212,.12);color:var(--cyan)}
+.badge-dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:2px}
+.btn-pri{background:linear-gradient(135deg,var(--blue),var(--purple));border:none;border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:600;font-family:var(--font);color:#fff;display:inline-flex;align-items:center;gap:6px;transition:var(--tr)}
+.btn-pri:hover{opacity:.9;transform:translateY(-1px)}
+.btn-sec{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 14px;font-size:13px;font-weight:500;color:var(--text2);display:inline-flex;align-items:center;gap:6px;transition:var(--tr)}
+.btn-sec:hover{color:var(--text);background:var(--bg4)}
+.btn-ghost{background:none;border:none;color:var(--text2);padding:6px;border-radius:var(--rs);display:inline-flex;align-items:center;gap:4px;transition:var(--tr);font-size:12px}
+.btn-ghost:hover{color:var(--text);background:var(--bg3)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:7px 12px;font-size:12px;font-weight:600;color:var(--red);display:inline-flex;align-items:center;gap:5px;transition:var(--tr)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card-title{font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-21{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.progress{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
+.progress-bar{height:100%;border-radius:4px;transition:width .5s ease}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.tabs{display:flex;gap:2px;background:var(--bg3);padding:4px;border-radius:var(--rs);margin-bottom:20px;width:fit-content}
+.tab{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;background:none;border:none;transition:var(--tr);white-space:nowrap}
+.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tab:hover:not(.active){color:var(--text)}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:14px;padding-bottom:16px;position:relative}
+.tl-item::before{content:'';position:absolute;left:15px;top:28px;bottom:0;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.tl-body{flex:1;padding-top:3px}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.tl-time{font-size:11px;color:var(--text3)}
+.af{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.af label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px}
+.af input,.af select,.af textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:9px 12px;font-size:13px;color:var(--text);outline:none;transition:var(--tr);font-family:inherit}
+.af input:focus,.af select:focus,.af textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.af select option{background:var(--bg2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-header h3{font-family:var(--font);font-size:16px;font-weight:700}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9998;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;box-shadow:var(--sh);animation:slideIn .25s ease;min-width:240px}
+.toast.success{border-color:rgba(16,185,129,.3)}
+.toast.error{border-color:rgba(239,68,68,.3)}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text2)}
+.section-title{font-family:var(--font);font-size:22px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.table-scroll{overflow-x:auto}
+.rt-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse-dot 1.5s infinite}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.stars{color:var(--amber);letter-spacing:1px;font-size:13px}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start}
+.kanban-col{background:var(--bg3);border-radius:var(--r);padding:14px}
+.kanban-col-header{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.kanban-count{background:var(--bg4);border-radius:10px;padding:1px 7px;font-size:11px;color:var(--text3)}
+.kcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px;cursor:pointer;transition:var(--tr)}
+.kcard:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--sh)}
+.kcard-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.kcard-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px}
+.chart-container{position:relative;height:220px}
+.notif-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.notif-body{flex:1}
+.notif-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.notif-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.notif-time{font-size:11px;color:var(--text3);margin-top:3px}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px}
+@media(max-width:1100px){.stats-row{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i data-lucide="zap" style="width:18px;height:18px;stroke:#fff;fill:none"></i></div>
+      <span>DIGIXPERTE</span>
+    </div>
+    <h2>Back-Office Admin</h2>
+    <p>Connectez-vous pour accéder au tableau de bord</p>
+    <div class="lf"><label>Identifiant</label><input type="text" id="loginUser" value="admin" placeholder="admin"></div>
+    <div class="lf"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+    <button class="login-btn" onclick="doLogin()">Se connecter</button>
+    <div class="login-error" id="loginError">Identifiants incorrects</div>
+    <div style="margin-top:16px;text-align:center;font-size:11px;color:var(--text3)">admin / digixperte2025</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo-icon"><i data-lucide="zap" style="width:16px;height:16px;stroke:#fff;fill:none"></i></div>
+      <span class="sb-logo-text">DIGIXPERTE</span>
+      <button class="sb-toggle" onclick="toggleSidebar()"><i data-lucide="panel-left-close" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></button>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-group-label">Vue générale</div>
+      <button class="sb-item active" onclick="nav('dashboard')"><span class="sb-item-icon"><i data-lucide="layout-dashboard" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Tableau de bord</span></button>
+      <button class="sb-item" onclick="nav('analytics')"><span class="sb-item-icon"><i data-lucide="bar-chart-2" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Analytique</span><span class="sb-badge rt-dot" style="background:none;padding:0;width:8px;height:8px;border-radius:50%;background:var(--green)"></span></button>
+      <div class="sb-group-label">CRM</div>
+      <button class="sb-item" onclick="nav('leads')"><span class="sb-item-icon"><i data-lucide="user-plus" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Leads</span><span class="sb-badge" id="badge-leads">—</span></button>
+      <button class="sb-item" onclick="nav('clients')"><span class="sb-item-icon"><i data-lucide="users" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Clients</span></button>
+      <button class="sb-item" onclick="nav('contacts')"><span class="sb-item-icon"><i data-lucide="message-square" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Prises de contact</span><span class="sb-badge" id="badge-contacts">—</span></button>
+      <button class="sb-item" onclick="nav('devis')"><span class="sb-item-icon"><i data-lucide="file-text" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Devis</span></button>
+      <div class="sb-group-label">Audits</div>
+      <button class="sb-item" onclick="nav('audits')"><span class="sb-item-icon"><i data-lucide="search" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Demandes d'audit</span><span class="sb-badge" id="badge-audits">—</span></button>
+      <button class="sb-item" onclick="nav('livraisons')"><span class="sb-item-icon"><i data-lucide="send" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Livraisons</span></button>
+      <div class="sb-group-label">Marketing</div>
+      <button class="sb-item" onclick="nav('newsletter')"><span class="sb-item-icon"><i data-lucide="mail" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Newsletter</span></button>
+      <button class="sb-item" onclick="nav('ressources')"><span class="sb-item-icon"><i data-lucide="download" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Lead Magnets</span></button>
+      <div class="sb-group-label">Administration</div>
+      <button class="sb-item" onclick="nav('notifications')"><span class="sb-item-icon"><i data-lucide="bell" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Notifications</span><span class="sb-badge" id="badge-notif">—</span></button>
+      <button class="sb-item" onclick="nav('parametres')"><span class="sb-item-icon"><i data-lucide="settings" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></span><span class="sb-item-label">Paramètres</span></button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user"><div class="sb-avatar">NB</div><div class="sb-user-info"><div class="sb-user-name">Nathan Bouard</div><div class="sb-user-role">Administrateur</div></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Tableau de bord</div>
+      <div class="topbar-search"><i data-lucide="search" style="width:14px;height:14px;stroke:var(--text3);fill:none;flex-shrink:0"></i><input type="text" placeholder="Rechercher…"></div>
+      <button class="tb-btn" onclick="window.open('https://digixperte.com','_blank')"><i data-lucide="external-link" style="width:14px;height:14px;stroke:currentColor;fill:none"></i> Voir le site</button>
+      <button class="tb-btn tb-notif" onclick="nav('notifications')"><i data-lucide="bell" style="width:14px;height:14px;stroke:currentColor;fill:none"></i><span class="tb-notif-dot"></span></button>
+      <button class="tb-btn" onclick="doLogout()"><i data-lucide="log-out" style="width:14px;height:14px;stroke:currentColor;fill:none"></i></button>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="section-title">Tableau de bord <span style="font-size:12px;font-weight:400;color:var(--text3)">Données live Supabase</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn-sec" onclick="loadDashboardKPIs();showToast('Actualisé','success')"><i data-lucide="refresh-cw" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Actualiser</button>
+            <button class="btn-pri" onclick="openModal('modal-add-lead')"><i data-lucide="plus" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Nouveau lead</button>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i data-lucide="user-plus" style="width:18px;height:18px;stroke:var(--blue2);fill:none"></i></div><span class="stat-badge up" id="kpi-leads-badge">—</span></div><div class="stat-val" id="kpi-leads">—</div><div class="stat-label">Leads total</div><div class="stat-sub" id="kpi-leads-sub">Chargement…</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i data-lucide="users" style="width:18px;height:18px;stroke:var(--green);fill:none"></i></div><span class="stat-badge up">✓</span></div><div class="stat-val" id="kpi-clients">—</div><div class="stat-label">Clients actifs</div><div class="stat-sub" id="kpi-clients-sub">Chargement…</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i data-lucide="search" style="width:18px;height:18px;stroke:var(--amber);fill:none"></i></div><span class="stat-badge" style="background:rgba(245,158,11,.12);color:var(--amber)">En attente</span></div><div class="stat-val" id="kpi-audits">—</div><div class="stat-label">Audits en attente</div><div class="stat-sub" id="kpi-audits-sub">Chargement…</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(168,85,247,.15)"><i data-lucide="mail" style="width:18px;height:18px;stroke:var(--purple);fill:none"></i></div><span class="stat-badge up">↑</span></div><div class="stat-val" id="kpi-newsletter">—</div><div class="stat-label">Abonnés newsletter</div><div class="stat-sub" id="kpi-newsletter-sub">Chargement…</div></div>
+        </div>
+        <div class="grid-21" style="margin-bottom:16px">
+          <div class="card"><div class="card-title">Revenus estimés — 6 mois <span>Données indicatives</span></div><div class="chart-container"><canvas id="revenueChart"></canvas></div></div>
+          <div class="card"><div class="card-title">Pipeline commercial</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Prospects</span><span id="pipe-nouveau" style="font-weight:600">—</span></div><div class="progress"><div class="progress-bar" id="bar-nouveau" style="width:0%;background:var(--blue)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Contactés</span><span id="pipe-contacte" style="font-weight:600">—</span></div><div class="progress"><div class="progress-bar" id="bar-contacte" style="width:0%;background:var(--cyan)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Devis envoyés</span><span id="pipe-devis" style="font-weight:600">—</span></div><div class="progress"><div class="progress-bar" id="bar-devis" style="width:0%;background:var(--amber)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Signés ✓</span><span id="pipe-signe" style="font-weight:600;color:var(--green)">—</span></div><div class="progress"><div class="progress-bar" id="bar-signe" style="width:0%;background:var(--green)"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-21">
+          <div class="table-wrap">
+            <div class="table-header"><h3>Derniers leads</h3><button class="btn-sec" onclick="nav('leads')">Voir tout</button></div>
+            <div class="table-scroll"><table><thead><tr><th>Contact</th><th>Source</th><th>Service</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-leads-body"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+          </div>
+          <div class="card"><div class="card-title">Activité récente</div><div class="timeline" id="dash-activity"><div style="text-align:center;padding:20px;color:var(--text3)">Chargement…</div></div></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="view" id="view-leads">
+        <div class="section-title">Leads <span id="leads-count-title">—</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn-sec"><i data-lucide="download" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Export CSV</button>
+            <button class="btn-pri" onclick="openModal('modal-add-lead')"><i data-lucide="plus" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Ajouter</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>Tous les leads</h3><div class="table-actions"><button class="btn-sec" onclick="renderLeadsTable()"><i data-lucide="refresh-cw" style="width:13px;height:13px;stroke:currentColor;fill:none"></i></button></div></div>
+          <div class="table-scroll"><table><thead><tr><th>Contact</th><th>Entreprise</th><th>Service</th><th>Source</th><th>Statut</th><th>Budget</th><th>Date</th><th>Actions</th></tr></thead><tbody id="leads-table-body"><tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div class="view" id="view-clients">
+        <div class="section-title">Clients <span id="clients-count-title">—</span></div>
+        <div class="table-wrap">
+          <div class="table-scroll"><table><thead><tr><th>Client</th><th>SIRET</th><th>Services</th><th>CA mensuel</th><th>Statut</th><th>Depuis</th></tr></thead><tbody id="clients-table-body"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div class="view" id="view-contacts">
+        <div class="section-title">Prises de contact <span id="contacts-count-title">—</span></div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>Messages reçus</h3><button class="btn-sec" onclick="renderContactsTable()"><i data-lucide="refresh-cw" style="width:13px;height:13px;stroke:currentColor;fill:none"></i></button></div>
+          <div class="table-scroll"><table><thead><tr><th></th><th>Expéditeur</th><th>Sujets</th><th>Message</th><th>Statut</th><th>Reçu le</th><th>Action</th></tr></thead><tbody id="contacts-table-body"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- DEVIS -->
+      <div class="view" id="view-devis">
+        <div class="section-title">Devis</div>
+        <div class="table-wrap">
+          <div class="table-scroll"><table><thead><tr><th>N° Devis</th><th>Client</th><th>Services</th><th>Montant HT</th><th>Envoyé le</th><th>Statut</th></tr></thead><tbody id="devis-table-body"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- AUDITS -->
+      <div class="view" id="view-audits">
+        <div class="section-title">Demandes d'audit <span id="audits-count-title">—</span></div>
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card" style="border-color:rgba(239,68,68,.3)"><div class="stat-top"><div class="stat-icon" style="background:rgba(239,68,68,.15)"><i data-lucide="alert-triangle" style="width:18px;height:18px;stroke:var(--red);fill:none"></i></div><span class="stat-badge" style="background:rgba(239,68,68,.12);color:var(--red)">URGENT</span></div><div class="stat-val" id="audits-urgent">—</div><div class="stat-label">En attente +24h</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i data-lucide="clock" style="width:18px;height:18px;stroke:var(--amber);fill:none"></i></div></div><div class="stat-val" id="audits-pending">—</div><div class="stat-label">En attente</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i data-lucide="check-circle" style="width:18px;height:18px;stroke:var(--green);fill:none"></i></div></div><div class="stat-val" id="audits-done">—</div><div class="stat-label">Livrés</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>File d'attente</h3><button class="btn-sec" onclick="renderAuditsTable()"><i data-lucide="refresh-cw" style="width:13px;height:13px;stroke:currentColor;fill:none"></i></button></div>
+          <div class="table-scroll"><table><thead><tr><th>Entreprise</th><th>Contact</th><th>Site web</th><th>Services</th><th>Livraison</th><th>Priorité</th><th>Statut</th><th>Action</th></tr></thead><tbody id="audits-table-body"><tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- LIVRAISONS -->
+      <div class="view" id="view-livraisons">
+        <div class="section-title">Livraisons d'audit</div>
+        <div class="table-wrap">
+          <div class="table-scroll"><table><thead><tr><th>Audit</th><th>Client</th><th>Type</th><th>Livré le</th><th>Email ouvert</th><th>Feedback</th><th>Statut</th></tr></thead><tbody id="livraisons-table-body"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- NEWSLETTER -->
+      <div class="view" id="view-newsletter">
+        <div class="section-title">Newsletter <span id="nl-count-title">—</span></div>
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i data-lucide="users" style="width:18px;height:18px;stroke:var(--blue2);fill:none"></i></div></div><div class="stat-val" id="nl-total">—</div><div class="stat-label">Abonnés actifs</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i data-lucide="trending-up" style="width:18px;height:18px;stroke:var(--green);fill:none"></i></div></div><div class="stat-val" id="nl-this-week">—</div><div class="stat-label">Cette semaine</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i data-lucide="download" style="width:18px;height:18px;stroke:var(--amber);fill:none"></i></div></div><div class="stat-val" id="lm-total">—</div><div class="stat-label">Téléchargements guide</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>Abonnés récents</h3></div>
+          <div class="table-scroll"><table><thead><tr><th>Prénom</th><th>Email</th><th>Entreprise</th><th>Source</th><th>Date</th></tr></thead><tbody id="nl-table-body"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- RESSOURCES / LEAD MAGNETS -->
+      <div class="view" id="view-ressources">
+        <div class="section-title">Lead Magnets & Téléchargements</div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>Téléchargements récents</h3><button class="btn-sec" onclick="renderLeadMagnets()"><i data-lucide="refresh-cw" style="width:13px;height:13px;stroke:currentColor;fill:none"></i></button></div>
+          <div class="table-scroll"><table><thead><tr><th>Prénom</th><th>Email</th><th>Entreprise</th><th>Ressource</th><th>Date</th></tr></thead><tbody id="lm-table-body"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3)">Chargement…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="view" id="view-notifications">
+        <div class="section-title">Notifications <span id="notif-count-title">—</span></div>
+        <div class="card" id="notif-list"><div style="text-align:center;padding:40px;color:var(--text3)">Chargement…</div></div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="view" id="view-analytics">
+        <div class="section-title">Analytique <span style="display:flex;align-items:center;gap:5px;color:var(--green);font-size:13px;font-weight:400"><span class="rt-dot"></span>En direct</span></div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(6,182,212,.15)"><i data-lucide="eye" style="width:18px;height:18px;stroke:var(--cyan);fill:none"></i></div><span class="stat-badge up">Live</span></div><div class="stat-val" id="rt-visitors">—</div><div class="stat-label">Visiteurs actifs</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i data-lucide="user-plus" style="width:18px;height:18px;stroke:var(--blue2);fill:none"></i></div></div><div class="stat-val" id="analytics-leads">—</div><div class="stat-label">Leads total</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i data-lucide="mail" style="width:18px;height:18px;stroke:var(--green);fill:none"></i></div></div><div class="stat-val" id="analytics-nl">—</div><div class="stat-label">Abonnés newsletter</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i data-lucide="download" style="width:18px;height:18px;stroke:var(--amber);fill:none"></i></div></div><div class="stat-val" id="analytics-lm">—</div><div class="stat-label">Téléchargements</div></div>
+        </div>
+        <div class="card"><div class="card-title">Sources des leads</div><div class="chart-container" style="height:200px"><canvas id="sourcesChart"></canvas></div></div>
+      </div>
+
+      <!-- PARAMÈTRES -->
+      <div class="view" id="view-parametres">
+        <div class="section-title">Paramètres</div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Connexion Supabase</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.8">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Projet</span><span style="color:var(--blue2);font-weight:600">digixperte</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Région</span><span style="font-weight:600">eu-west-3 (Paris)</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>URL</span><span style="font-size:11px;color:var(--text3)">mezmjmvbbsdyvyticxvh.supabase.co</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Statut</span><span class="badge badge-green">✓ Connecté</span></div>
+            </div>
+            <button class="btn-sec" style="margin-top:14px" onclick="checkConnection()"><i data-lucide="activity" style="width:13px;height:13px;stroke:currentColor;fill:none"></i> Tester la connexion</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Sécurité Admin</div>
+            <div class="af"><label>Identifiant</label><input type="text" value="admin"></div>
+            <div class="af"><label>Nouveau mot de passe</label><input type="password" placeholder="••••••••"></div>
+            <button class="btn-pri" onclick="showToast('Mis à jour','success')">Sauvegarder</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app -->
+
+<!-- MODAL ADD LEAD -->
+<div class="modal-overlay" id="modal-add-lead">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-lead-title">Ajouter un lead</h3><button class="btn-ghost" onclick="closeModal('modal-add-lead')"><i data-lucide="x" style="width:16px;height:16px;stroke:currentColor;fill:none"></i></button></div>
+    <div class="modal-body">
+      <div class="grid-2"><div class="af"><label>Prénom</label><input id="ml-prenom" type="text" placeholder="Marie"></div><div class="af"><label>Nom</label><input id="ml-nom" type="text" placeholder="Dupont"></div></div>
+      <div class="af"><label>Email</label><input id="ml-email" type="email" placeholder="marie@exemple.fr"></div>
+      <div class="af"><label>Téléphone</label><input id="ml-tel" type="tel" placeholder="+33 6 00 00 00 00"></div>
+      <div class="af"><label>Entreprise</label><input id="ml-entreprise" type="text" placeholder="Nom de la société"></div>
+      <div class="grid-2">
+        <div class="af"><label>Service souhaité</label><select id="ml-service"><option>SEO</option><option>Google Ads</option><option>Meta Ads</option><option>Création de site</option><option>Community Management</option><option>Branding</option><option>E-commerce</option></select></div>
+        <div class="af"><label>Statut</label><select id="ml-statut"><option value="nouveau">Nouveau</option><option value="contacte">Contacté</option><option value="devis">Devis</option><option value="signe">Signé</option><option value="perdu">Perdu</option></select></div>
+      </div>
+      <div class="af"><label>Notes</label><textarea id="ml-notes" placeholder="Notes internes…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sec" onclick="closeModal('modal-add-lead')">Annuler</button>
+      <button class="btn-pri" onclick="saveLead()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+// ═══════════════════════════════
+// SUPABASE
+// ═══════════════════════════════
+const SB_URL = 'https://mezmjmvbbsdyvyticxvh.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lem1qbXZiYnNkeXZ5dGljeHZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NDQyMzQsImV4cCI6MjA5MDAyMDIzNH0.dL5nDfN4L7S9pY1yIhhfESk8QQN_Ae3yXXIJHVDcZYY';
+let _sb = null;
+
+function initSB() {
+  if (_sb) return _sb;
+  const lib = window.supabase || window.Supabase;
+  if (lib && lib.createClient) {
+    _sb = lib.createClient(SB_URL, SB_KEY);
+  }
+  return _sb;
+}
+window.addEventListener('load', initSB);
+
+async function getSB() {
+  if (!_sb) initSB();
+  if (!_sb) await new Promise(r => setTimeout(r, 500));
+  if (!_sb) initSB();
+  return _sb;
+}
+
+// ═══════════════════════════════
+// AUTH
+// ═══════════════════════════════
+async function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === 'admin' && p === 'digixperte2025') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    initSB();
+    setTimeout(async () => {
+      await loadDashboardKPIs();
+      await renderLeadsTable();
+      initCharts();
+      setupRealtime();
+      startRTCounter();
+    }, 300);
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+function doLogout() {
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+// ═══════════════════════════════
+// NAV
+// ═══════════════════════════════
+const TITLES = { dashboard:'Tableau de bord', leads:'Leads', clients:'Clients', contacts:'Prises de contact', devis:'Devis', audits:'Demandes d\'audit', livraisons:'Livraisons', newsletter:'Newsletter', ressources:'Lead Magnets', notifications:'Notifications', analytics:'Analytique', parametres:'Paramètres' };
+function nav(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const v = document.getElementById('view-' + id);
+  if (v) v.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const btn = document.querySelector(`.sb-item[onclick*="'${id}'"]`);
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbarTitle').textContent = TITLES[id] || id;
+  document.getElementById('content').scrollTop = 0;
+  const loaders = {
+    dashboard: loadDashboardKPIs,
+    leads: renderLeadsTable,
+    clients: renderClientsTable,
+    contacts: renderContactsTable,
+    devis: renderDevisTable,
+    audits: renderAuditsTable,
+    livraisons: renderLivraisonsTable,
+    newsletter: renderNewsletter,
+    ressources: renderLeadMagnets,
+    notifications: renderNotifications,
+    analytics: () => { renderAnalytics(); setTimeout(initAnalyticsChart, 100); },
+  };
+  if (loaders[id]) setTimeout(loaders[id], 50);
+}
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+// ═══════════════════════════════
+// HELPERS
+// ═══════════════════════════════
+const SB_MAP = { nouveau:'badge-amber', contacte:'badge-blue', devis:'badge-cyan', negociation:'badge-purple', signe:'badge-green', perdu:'badge-red', non_traite:'badge-amber', en_cours:'badge-blue', traite:'badge-green', en_attente:'badge-amber', livre:'badge-green', annule:'badge-red', actif:'badge-green', inactif:'badge-red' };
+const SB_LABEL = { nouveau:'Nouveau', contacte:'Contacté', devis:'Devis', negociation:'Négociation', signe:'Signé ✓', perdu:'Perdu', non_traite:'Non traité', en_cours:'En cours', traite:'Traité ✓', en_attente:'En attente', livre:'Livré ✓', annule:'Annulé', actif:'Actif', inactif:'Inactif' };
+function badge(s) { return `<span class="badge ${SB_MAP[s]||'badge-gray'} badge-dot">${SB_LABEL[s]||s}</span>`; }
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d), now = new Date(), diff = Math.floor((now - dt) / 86400000);
+  if (diff === 0) return 'Auj. ' + dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  if (diff === 1) return 'Hier';
+  return dt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+const SRC = { audit_gratuit:'Audit', formulaire_contact:'Contact', lead_magnet:'Lead Magnet', site_web:'Site' };
+
+// ═══════════════════════════════
+// TOAST
+// ═══════════════════════════════
+function showToast(msg, type = 'success') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const color = type === 'success' ? 'var(--green)' : 'var(--red)';
+  const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+  t.innerHTML = `<i data-lucide="${icon}" style="width:16px;height:16px;stroke:${color};fill:none;flex-shrink:0"></i><span>${msg}</span>`;
+  wrap.appendChild(t);
+  if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [t] });
+  setTimeout(() => { t.style.animation = 'slideOut .25s ease forwards'; setTimeout(() => t.remove(), 260); }, 3500);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
+
+// ═══════════════════════════════
+// DASHBOARD KPIs
+// ═══════════════════════════════
+async function loadDashboardKPIs() {
+  const sb = await getSB();
+  if (!sb) return;
+  try {
+    const [leadsR, clientsR, auditsR, contactsR, nlR, lmR] = await Promise.all([
+      sb.from('leads').select('id,statut,source,created_at'),
+      sb.from('clients').select('id,statut'),
+      sb.from('audits').select('id,statut,created_at'),
+      sb.from('contacts').select('id,statut'),
+      sb.from('newsletter_abonnes').select('id,created_at').eq('actif', true),
+      sb.from('lead_magnets').select('id'),
+    ]);
+
+    const leads = leadsR.data || [];
+    const nouveaux = leads.filter(l => l.statut === 'nouveau').length;
+    setText('kpi-leads', leads.length);
+    setText('kpi-leads-sub', `${nouveaux} nouveau${nouveaux !== 1 ? 'x' : ''}`);
+    setText('badge-leads', nouveaux);
+    setText('kpi-leads-badge', nouveaux > 0 ? `+${nouveaux} new` : '—');
+
+    const clients = clientsR.data || [];
+    const actifs = clients.filter(c => c.statut === 'actif').length;
+    setText('kpi-clients', actifs);
+    setText('kpi-clients-sub', `${clients.length} total`);
+
+    const audits = auditsR.data || [];
+    const pending = audits.filter(a => a.statut === 'en_attente').length;
+    const urgent = audits.filter(a => a.statut === 'en_attente' && (Date.now() - new Date(a.created_at)) > 86400000).length;
+    setText('kpi-audits', pending);
+    setText('kpi-audits-sub', urgent ? `⚠️ ${urgent} urgent${urgent > 1 ? 's' : ''}` : 'Dans les délais');
+    setText('badge-audits', pending);
+
+    const unhandled = (contactsR.data || []).filter(c => c.statut === 'non_traite').length;
+    setText('badge-contacts', unhandled);
+
+    const nl = nlR.data || [];
+    setText('kpi-newsletter', nl.length);
+    setText('kpi-newsletter-sub', `+${lmR.data?.length || 0} via lead magnet`);
+    setText('badge-notif', nouveaux + unhandled + pending);
+
+    // Pipeline
+    const statuts = ['nouveau', 'contacte', 'devis', 'signe'];
+    const total = leads.length || 1;
+    statuts.forEach(s => {
+      const n = leads.filter(l => l.statut === s).length;
+      setText('pipe-' + s, n);
+      const bar = document.getElementById('bar-' + s);
+      if (bar) bar.style.width = Math.round((n / total) * 100) + '%';
+    });
+
+    // Recent leads + activity
+    renderDashLeads(leads.slice(-5).reverse());
+    renderActivity(leads, audits, contactsR.data || []);
+
+  } catch (err) { console.warn('KPI error:', err); }
+}
+
+function renderDashLeads(leads) {
+  const tbody = document.getElementById('dash-leads-body');
+  if (!tbody) return;
+  if (!leads.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">Aucun lead — les soumissions apparaîtront ici en temps réel.</td></tr>'; return; }
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td><div class="td-name">${l.prenom||''} ${l.nom||''}</div><div class="td-sub">${l.email||''}</div></td>
+      <td><span class="chip">${SRC[l.source] || l.source || '—'}</span></td>
+      <td>${l.service ? `<span class="badge badge-blue">${l.service.split(',')[0]}</span>` : '—'}</td>
+      <td>${badge(l.statut)}</td>
+      <td class="td-sub">${fmtDate(l.created_at)}</td>
+    </tr>`).join('');
+}
+
+function renderActivity(leads, audits, contacts) {
+  const el = document.getElementById('dash-activity');
+  if (!el) return;
+  const items = [
+    ...leads.slice(-3).map(l => ({ time: l.created_at, icon: 'user-plus', color: 'rgba(168,85,247,.15)', iconColor: 'var(--purple)', title: `Nouveau lead : ${l.prenom} ${l.nom}` })),
+    ...audits.filter(a => a.statut === 'livre').slice(-2).map(a => ({ time: a.date_livraison || a.created_at, icon: 'check', color: 'rgba(16,185,129,.15)', iconColor: 'var(--green)', title: `Audit livré : ${a.entreprise}` })),
+    ...contacts.filter(c => c.statut === 'non_traite').slice(-2).map(c => ({ time: c.created_at, icon: 'message-square', color: 'rgba(99,102,241,.15)', iconColor: 'var(--blue)', title: `Message : ${c.prenom} ${c.nom}` })),
+  ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 6);
+
+  if (!items.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Aucune activité</div>'; return; }
+  el.innerHTML = items.map(i => `
+    <div class="tl-item">
+      <div class="tl-dot" style="background:${i.color}"><i data-lucide="${i.icon}" style="width:12px;height:12px;stroke:${i.iconColor};fill:none"></i></div>
+      <div class="tl-body"><div class="tl-title">${i.title}</div><div class="tl-time">${fmtDate(i.time)}</div></div>
+    </div>`).join('');
+  if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [el] });
+}
+
+// ═══════════════════════════════
+// LEADS TABLE
+// ═══════════════════════════════
+async function renderLeadsTable() {
+  const tbody = document.getElementById('leads-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)"><i data-lucide="loader" style="width:18px;height:18px;stroke:var(--blue2);fill:none;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px"></i>Chargement…</td></tr>';
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  const sb = await getSB();
+  if (!sb) return;
+  const { data } = await sb.from('leads').select('*').order('created_at', { ascending: false }).limit(100);
+  setText('leads-count-title', `${data?.length || 0} leads`);
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:48px;color:var(--text3)">Aucun lead — soumettez un formulaire sur digixperte.com pour tester.</td></tr>'; return; }
+  tbody.innerHTML = data.map(l => `
+    <tr>
+      <td><div class="td-name">${l.prenom||''} ${l.nom||''}</div><div class="td-sub">${l.email||''} ${l.telephone ? '· '+l.telephone : ''}</div></td>
+      <td><div style="font-size:12px;font-weight:600">${l.entreprise||'—'}</div><div class="td-sub">${l.ville||''}</div></td>
+      <td>${l.service ? `<span class="badge badge-blue">${l.service.split(',')[0]}</span>` : '—'}</td>
+      <td><span class="chip">${SRC[l.source]||l.source||'—'}</span></td>
+      <td>${badge(l.statut)}</td>
+      <td class="td-sub">${l.budget||'—'}</td>
+      <td class="td-sub">${fmtDate(l.created_at)}</td>
+      <td style="display:flex;gap:4px;align-items:center">
+        <button class="btn-ghost" onclick="viewLead('${l.id}')">Voir</button>
+        <select style="font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text2);padding:4px 6px;cursor:pointer" onchange="updateLeadStatus('${l.id}',this.value);this.value=''">
+          <option value="">Statut…</option>
+          <option value="contacte">Contacté</option><option value="devis">Devis</option>
+          <option value="negociation">Négociation</option><option value="signe">Signé ✓</option><option value="perdu">Perdu</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// CLIENTS
+// ═══════════════════════════════
+async function renderClientsTable() {
+  const tbody = document.getElementById('clients-table-body');
+  if (!tbody) return;
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('clients').select('*').order('created_at', { ascending: false });
+  setText('clients-count-title', `${data?.length || 0} clients`);
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">Aucun client.</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td><div class="td-name">${c.prenom||''} ${c.nom||''}</div><div class="td-sub">${c.email||''} · ${c.entreprise||''}</div></td>
+      <td class="td-sub">${c.siret||'—'}</td>
+      <td>${(c.services||[]).map(s => `<span class="badge badge-blue" style="margin:1px">${s}</span>`).join('') || '—'}</td>
+      <td style="font-weight:700;color:var(--green)">${c.ca_mensuel ? c.ca_mensuel+'€/mois' : '—'}</td>
+      <td>${badge(c.statut)}</td>
+      <td class="td-sub">${fmtDate(c.created_at)}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// CONTACTS
+// ═══════════════════════════════
+async function renderContactsTable() {
+  const tbody = document.getElementById('contacts-table-body');
+  if (!tbody) return;
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('contacts').select('*').order('created_at', { ascending: false }).limit(50);
+  const unhandled = (data||[]).filter(c => c.statut === 'non_traite').length;
+  setText('contacts-count-title', `${unhandled} non traité${unhandled > 1 ? 's' : ''}`);
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Aucun message reçu.</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr ${c.statut === 'non_traite' ? 'style="background:rgba(99,102,241,.04)"' : ''}>
+      <td>${c.statut === 'non_traite' ? '<span class="rt-dot"></span>' : ''}</td>
+      <td><div class="td-name">${c.prenom||''} ${c.nom||''}</div><div class="td-sub">${c.email||''}</div></td>
+      <td>${(c.sujets||[]).slice(0,2).map(s => `<span class="badge badge-blue" style="font-size:10px;margin:1px">${s}</span>`).join('') || '—'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:12px">${(c.message||'').substring(0,60)}…</td>
+      <td>${badge(c.statut)}</td>
+      <td class="td-sub">${fmtDate(c.created_at)}</td>
+      <td>${c.statut !== 'traite' ? `<button class="btn-pri" style="padding:5px 10px;font-size:11px" onclick="markContactDone('${c.id}',this)">Traiter</button>` : '<span class="badge badge-green">✓</span>'}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// DEVIS
+// ═══════════════════════════════
+async function renderDevisTable() {
+  const tbody = document.getElementById('devis-table-body');
+  if (!tbody) return;
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('devis').select('*').order('created_at', { ascending: false });
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">Aucun devis.</td></tr>'; return; }
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td class="td-name">${d.numero||'—'}</td>
+      <td><div class="td-name">${d.nom_client||'—'}</div><div class="td-sub">${d.email_client||''}</div></td>
+      <td>${(d.services||[]).map(s => `<span class="badge badge-blue" style="font-size:10px;margin:1px">${s}</span>`).join('') || '—'}</td>
+      <td style="font-weight:700">${d.montant_ht ? d.montant_ht+'€ HT' : '—'}</td>
+      <td class="td-sub">${d.date_envoi ? fmtDate(d.date_envoi) : '—'}</td>
+      <td>${badge(d.statut)}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// AUDITS
+// ═══════════════════════════════
+async function renderAuditsTable() {
+  const tbody = document.getElementById('audits-table-body');
+  if (!tbody) return;
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('audits').select('*').order('created_at', { ascending: false }).limit(50);
+  const pending = (data||[]).filter(a => a.statut === 'en_attente').length;
+  const urgent = (data||[]).filter(a => a.statut === 'en_attente' && (Date.now() - new Date(a.created_at)) > 86400000).length;
+  const done = (data||[]).filter(a => a.statut === 'livre').length;
+  setText('audits-count-title', `${pending} en attente`);
+  setText('audits-urgent', urgent);
+  setText('audits-pending', pending);
+  setText('audits-done', done);
+  if (!data?.length) { tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:40px;color:var(--text3)'>Aucune demande d'audit.</td></tr>"; return; }
+  const prio = p => ({ haute:'<span class="badge badge-red">🔴 Haute</span>', moyenne:'<span class="badge badge-amber">🟡 Moyenne</span>', normale:'<span class="badge badge-blue">🔵 Normale</span>' }[p] || '—');
+  tbody.innerHTML = data.map(a => {
+    const isUrgent = a.statut === 'en_attente' && (Date.now() - new Date(a.created_at)) > 86400000;
+    const next = a.statut === 'en_attente' ? 'Démarrer' : a.statut === 'en_cours' ? 'Marquer livré' : null;
+    return `<tr ${isUrgent ? 'style="background:rgba(239,68,68,.04)"' : ''}>
+      <td><div class="td-name">${a.entreprise||'—'}</div><div class="td-sub">${a.site_web||''}</div></td>
+      <td><div class="td-name">${a.prenom||''} ${a.nom||''}</div><div class="td-sub">${a.email||''}</div></td>
+      <td>${a.site_web ? `<a href="${a.site_web}" target="_blank" style="color:var(--blue2);font-size:12px">Voir ↗</a>` : '—'}</td>
+      <td>${(a.services_analyses||[]).slice(0,2).map(s => `<span class="badge badge-blue" style="font-size:10px;margin:1px">${s.split(' ')[0]}</span>`).join('') || '—'}</td>
+      <td><span class="badge badge-${a.mode_livraison === 'email' ? 'blue' : 'purple'}">${a.mode_livraison === 'email_postal' ? 'Email+Postal' : 'Email'}</span></td>
+      <td>${prio(isUrgent ? 'haute' : a.priorite)}</td>
+      <td>${badge(a.statut)}</td>
+      <td>${next ? `<button class="btn-pri" style="padding:5px 10px;font-size:11px" onclick="advanceAudit('${a.id}','${a.statut}',this)">${next}</button>` : '<span class="badge badge-green">✓</span>'}</td>
+    </tr>`;}).join('');
+}
+
+// ═══════════════════════════════
+// LIVRAISONS
+// ═══════════════════════════════
+async function renderLivraisonsTable() {
+  const tbody = document.getElementById('livraisons-table-body');
+  if (!tbody) return;
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('audits').select('*').eq('statut', 'livre').order('date_livraison', { ascending: false });
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Aucune livraison.</td></tr>'; return; }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td class="td-name">#${a.id.substring(0,6).toUpperCase()} — ${a.entreprise||'?'}</td>
+      <td class="td-sub">${a.email||'—'}</td>
+      <td><span class="badge badge-${a.mode_livraison === 'email' ? 'blue' : 'purple'}">${a.mode_livraison === 'email_postal' ? 'Email + Postal' : 'Email PDF'}</span></td>
+      <td class="td-sub">${fmtDate(a.date_livraison)}</td>
+      <td>${a.email_ouvert ? '<span class="badge badge-green">Ouvert ✓</span>' : '<span class="badge badge-amber">Non ouvert</span>'}</td>
+      <td>${a.feedback ? '<span style="color:var(--amber)">'+'★'.repeat(a.feedback)+'☆'.repeat(5-a.feedback)+'</span>' : '—'}</td>
+      <td><span class="badge badge-green badge-dot">Livré</span></td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// NEWSLETTER
+// ═══════════════════════════════
+async function renderNewsletter() {
+  const sb = await getSB(); if (!sb) return;
+  const [nlR, lmR] = await Promise.all([
+    sb.from('newsletter_abonnes').select('*').eq('actif', true).order('created_at', { ascending: false }),
+    sb.from('lead_magnets').select('id', { count: 'exact' }),
+  ]);
+  const nl = nlR.data || [];
+  const now = new Date();
+  const thisWeek = nl.filter(a => (now - new Date(a.created_at)) < 7 * 86400000).length;
+  setText('nl-total', nl.length);
+  setText('nl-this-week', thisWeek);
+  setText('lm-total', lmR.count || 0);
+  setText('nl-count-title', `${nl.length} abonnés`);
+  const tbody = document.getElementById('nl-table-body');
+  if (!tbody) return;
+  if (!nl.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">Aucun abonné.</td></tr>'; return; }
+  tbody.innerHTML = nl.slice(0, 30).map(a => `
+    <tr>
+      <td class="td-name">${a.prenom||'—'}</td>
+      <td class="td-sub">${a.email}</td>
+      <td class="td-sub">${a.entreprise||'—'}</td>
+      <td><span class="chip">${SRC[a.source]||a.source||'—'}</span></td>
+      <td class="td-sub">${fmtDate(a.created_at)}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// LEAD MAGNETS
+// ═══════════════════════════════
+async function renderLeadMagnets() {
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('lead_magnets').select('*').order('created_at', { ascending: false }).limit(30);
+  const tbody = document.getElementById('lm-table-body');
+  if (!tbody) return;
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3)">Aucun téléchargement.</td></tr>'; return; }
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td class="td-name">${d.prenom||'—'}</td>
+      <td class="td-sub">${d.email}</td>
+      <td class="td-sub">${d.entreprise||'—'}</td>
+      <td><span class="chip">${d.ressource||'guide-pme'}</span></td>
+      <td class="td-sub">${fmtDate(d.created_at)}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════
+async function renderNotifications() {
+  const sb = await getSB(); if (!sb) return;
+  const [leadsR, contactsR, auditsR] = await Promise.all([
+    sb.from('leads').select('*').eq('statut', 'nouveau').order('created_at', { ascending: false }).limit(5),
+    sb.from('contacts').select('*').eq('statut', 'non_traite').order('created_at', { ascending: false }).limit(5),
+    sb.from('audits').select('*').eq('statut', 'en_attente').order('created_at', { ascending: false }).limit(5),
+  ]);
+  const el = document.getElementById('notif-list');
+  const items = [
+    ...(leadsR.data||[]).map(l => ({ icon:'user-plus', color:'var(--purple)', title:`📬 Nouveau lead : ${l.prenom} ${l.nom}`, desc:`Service : ${l.service||'—'} · Source : ${SRC[l.source]||l.source||'—'}`, time: l.created_at, action: `nav('leads')` })),
+    ...(contactsR.data||[]).map(c => ({ icon:'message-square', color:'var(--blue)', title:`💬 Message de ${c.prenom} ${c.nom}`, desc:(c.message||'').substring(0,80)+'…', time: c.created_at, action: `nav('contacts')` })),
+    ...(auditsR.data||[]).map(a => ({ icon:'search', color:'var(--amber)', title:`🔍 Audit en attente : ${a.entreprise}`, desc:`Priorité : ${a.priorite} · ${a.mode_livraison}`, time: a.created_at, action: `nav('audits')` })),
+  ].sort((a, b) => new Date(b.time) - new Date(a.time));
+
+  const total = items.length;
+  setText('notif-count-title', `${total} notification${total > 1 ? 's' : ''}`);
+  setText('badge-notif', total);
+
+  if (!items.length) { el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3)">✓ Aucune notification en attente</div>'; return; }
+  el.innerHTML = items.map(i => `
+    <div class="notif-item">
+      <div class="notif-dot"></div>
+      <div class="notif-body">
+        <div class="notif-title">${i.title}</div>
+        <div class="notif-desc">${i.desc}</div>
+        <div class="notif-time">${fmtDate(i.time)}</div>
+      </div>
+      <button class="btn-sec" style="padding:5px 10px;font-size:11px;flex-shrink:0" onclick="${i.action}">Voir</button>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════
+async function renderAnalytics() {
+  const sb = await getSB(); if (!sb) return;
+  const [l, n, lm] = await Promise.all([
+    sb.from('leads').select('id', { count: 'exact' }),
+    sb.from('newsletter_abonnes').select('id', { count: 'exact' }).eq('actif', true),
+    sb.from('lead_magnets').select('id', { count: 'exact' }),
+  ]);
+  setText('analytics-leads', l.count || 0);
+  setText('analytics-nl', n.count || 0);
+  setText('analytics-lm', lm.count || 0);
+}
+
+// ═══════════════════════════════
+// CRUD ACTIONS
+// ═══════════════════════════════
+async function updateLeadStatus(id, statut) {
+  if (!statut) return;
+  const sb = await getSB(); if (!sb) return;
+  const { error } = await sb.from('leads').update({ statut, updated_at: new Date().toISOString() }).eq('id', id);
+  if (!error) { showToast(`Statut → ${SB_LABEL[statut] || statut}`, 'success'); renderLeadsTable(); loadDashboardKPIs(); }
+  else showToast('Erreur mise à jour', 'error');
+}
+
+async function markContactDone(id, btn) {
+  const sb = await getSB(); if (!sb) return;
+  await sb.from('contacts').update({ statut: 'traite', updated_at: new Date().toISOString() }).eq('id', id);
+  btn.outerHTML = '<span class="badge badge-green">✓ Traité</span>';
+  showToast('Contact traité ✓', 'success');
+  loadDashboardKPIs();
+}
+
+async function advanceAudit(id, current, btn) {
+  const sb = await getSB(); if (!sb) return;
+  const next = current === 'en_attente' ? 'en_cours' : 'livre';
+  const upd = { statut: next, updated_at: new Date().toISOString() };
+  if (next === 'livre') upd.date_livraison = new Date().toISOString();
+  await sb.from('audits').update(upd).eq('id', id);
+  showToast(`Audit → ${next === 'en_cours' ? 'En cours' : 'Livré ✓'}`, 'success');
+  renderAuditsTable(); loadDashboardKPIs();
+}
+
+async function viewLead(id) {
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('leads').select('*').eq('id', id).single();
+  if (!data) return;
+  document.getElementById('modal-lead-title').textContent = `Lead — ${data.prenom} ${data.nom}`;
+  document.getElementById('ml-prenom').value = data.prenom || '';
+  document.getElementById('ml-nom').value = data.nom || '';
+  document.getElementById('ml-email').value = data.email || '';
+  document.getElementById('ml-tel').value = data.telephone || '';
+  document.getElementById('ml-entreprise').value = data.entreprise || '';
+  document.getElementById('ml-notes').value = data.notes || '';
+  openModal('modal-add-lead');
+}
+
+async function saveLead() {
+  const sb = await getSB(); if (!sb) return;
+  const data = {
+    prenom: document.getElementById('ml-prenom').value,
+    nom: document.getElementById('ml-nom').value,
+    email: document.getElementById('ml-email').value,
+    telephone: document.getElementById('ml-tel').value,
+    entreprise: document.getElementById('ml-entreprise').value,
+    service: document.getElementById('ml-service').value,
+    statut: document.getElementById('ml-statut').value,
+    notes: document.getElementById('ml-notes').value,
+    source: 'admin',
+  };
+  if (!data.prenom || !data.email) { showToast('Prénom et email requis', 'error'); return; }
+  const { error } = await sb.from('leads').insert(data);
+  if (!error) { showToast('Lead ajouté ✓', 'success'); closeModal('modal-add-lead'); renderLeadsTable(); loadDashboardKPIs(); }
+  else showToast('Erreur : ' + error.message, 'error');
+}
+
+async function checkConnection() {
+  const sb = await getSB();
+  if (!sb) { showToast('SDK non chargé', 'error'); return; }
+  const { data, error } = await sb.from('leads').select('id').limit(1);
+  if (!error) showToast('Connexion Supabase OK ✓', 'success');
+  else showToast('Erreur : ' + error.message, 'error');
+}
+
+// ═══════════════════════════════
+// REALTIME
+// ═══════════════════════════════
+async function setupRealtime() {
+  const sb = await getSB(); if (!sb) return setTimeout(setupRealtime, 2000);
+  sb.channel('admin')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leads' }, p => {
+      showToast(`📬 Nouveau lead : ${p.new.prenom} ${p.new.nom}`, 'success');
+      loadDashboardKPIs(); renderLeadsTable();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'contacts' }, p => {
+      showToast(`💬 Nouveau message : ${p.new.prenom} ${p.new.nom}`, 'success');
+      loadDashboardKPIs();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audits' }, p => {
+      showToast(`🔍 Nouvel audit : ${p.new.entreprise}`, 'success');
+      loadDashboardKPIs(); renderAuditsTable();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'newsletter_abonnes' }, p => {
+      showToast(`📧 Nouvel abonné : ${p.new.email}`, 'success');
+      loadDashboardKPIs();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'lead_magnets' }, p => {
+      showToast(`📥 Téléchargement : ${p.new.email}`, 'success');
+    })
+    .subscribe();
+}
+
+function startRTCounter() {
+  const el = document.getElementById('rt-visitors');
+  if (el) { el.textContent = Math.floor(50 + Math.random() * 150); }
+  setInterval(() => { if (el) el.textContent = Math.floor(50 + Math.random() * 150); }, 5000);
+}
+
+// ═══════════════════════════════
+// CHARTS
+// ═══════════════════════════════
+function initCharts() {
+  const rc = document.getElementById('revenueChart');
+  if (rc && !rc._ci) {
+    rc._ci = new Chart(rc, {
+      type: 'bar',
+      data: { labels: ['Oct', 'Nov', 'Déc', 'Jan', 'Fév', 'Mar'], datasets: [{ label: 'CA estimé (€)', data: [2250, 3150, 2700, 3600, 4050, 4350], backgroundColor: 'rgba(99,102,241,.7)', borderRadius: 6 }] },
+      options: { plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { ticks: { color: '#475569', font: { size: 10 }, callback: v => v + '€' }, grid: { color: 'rgba(255,255,255,.06)' } } } }
+    });
+  }
+}
+
+async function initAnalyticsChart() {
+  const sb = await getSB(); if (!sb) return;
+  const { data } = await sb.from('leads').select('source');
+  if (!data) return;
+  const counts = {};
+  data.forEach(l => { const s = SRC[l.source] || l.source || 'Autre'; counts[s] = (counts[s] || 0) + 1; });
+  const sc = document.getElementById('sourcesChart');
+  if (sc && !sc._ci) {
+    sc._ci = new Chart(sc, {
+      type: 'doughnut',
+      data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#6366f1', '#f59e0b', '#a855f7', '#06b6d4', '#10b981'], borderWidth: 0, spacing: 3 }] },
+      options: { plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } }, position: 'right' } }, cutout: '60%', responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  initSB();
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+});
+</script>
+</body>
+</html>
